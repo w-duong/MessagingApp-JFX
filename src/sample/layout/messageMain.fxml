@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.controller.messageMainController">
+   <center>
+      <AnchorPane prefHeight="500.0" prefWidth="600.0">
+         <children>
+            <ListView fx:id="messageNow" prefHeight="250.0" prefWidth="200.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0" />
+            <TabPane fx:id="tabHolder" layoutX="200.0" prefHeight="525.0" prefWidth="400.0" tabClosingPolicy="UNAVAILABLE" />
+            <Separator layoutY="261.0" prefWidth="200.0" />
+            <ListView fx:id="messageLater" layoutY="275.0" prefHeight="250.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" />
+         </children>
+      </AnchorPane>
+   </center>
+   <top>
+      <MenuBar BorderPane.alignment="CENTER">
+        <menus>
+          <Menu mnemonicParsing="false" text="File">
+            <items>
+                  <MenuItem mnemonicParsing="false" onAction="#menuNewConnection" text="New Connection" />
+                  <MenuItem mnemonicParsing="false" text="Send File" />
+              <MenuItem mnemonicParsing="false" onAction="#menuClose" text="Close" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Help">
+            <items>
+              <MenuItem mnemonicParsing="false" text="About" />
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
+   </top>
+</BorderPane>
