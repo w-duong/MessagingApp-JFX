@@ -60,7 +60,7 @@ public class messageMainController implements Initializable
         for (Contact person : contacts)
             if (person.isOnline() && !onlineNow.contains(person))
                 onlineNow.add(person);
-            else if (onlineNow.contains(person))
+            else if (!person.isOnline() && onlineNow.contains(person))
                 onlineNow.remove(person);
     }
 

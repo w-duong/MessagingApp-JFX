@@ -35,12 +35,13 @@ public class Contact
     {
         Contact newPerson = new Contact ();
 
-        String [] fullArray = personalInfo.split("@");
-        String [] nameArray = fullArray[0].split(" ");
+        // can with multiple delimiters using 'Regex' or individual delimiters and '|' notation
+        String [] elements = personalInfo.split("@| ");
 
-        newPerson.setContactNumber(Integer.parseInt(fullArray[1]));
-        newPerson.setFirstName(nameArray[0]);
-        newPerson.setLastName(nameArray[1]);
+        newPerson.setFirstName(elements[0]);
+        newPerson.setLastName(elements[1]);
+        newPerson.setContactNumber(Integer.parseInt(elements[2]));
+
         newPerson.setOnline(true);
 
         return newPerson;
