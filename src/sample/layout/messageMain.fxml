@@ -19,7 +19,7 @@
         <menus>
           <Menu mnemonicParsing="false" text="File">
             <items>
-                  <MenuItem mnemonicParsing="false" text="New Connection" />
+                  <MenuItem mnemonicParsing="false" onAction="#menuNewConnection" text="New Connection" />
                   <MenuItem mnemonicParsing="false" text="Send File" />
               <MenuItem mnemonicParsing="false" onAction="#menuClose" text="Close" />
             </items>

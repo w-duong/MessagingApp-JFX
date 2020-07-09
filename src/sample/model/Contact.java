@@ -35,7 +35,7 @@ public class Contact
     {
         Contact newPerson = new Contact ();
 
-        // can with multiple delimiters using 'Regex' or individual delimiters and '|' notation
+        // can split with multiple delimiters using 'Regex' or individual delimiters and '|' notation
         String [] elements = personalInfo.split("@| ");
 
         newPerson.setFirstName(elements[0]);

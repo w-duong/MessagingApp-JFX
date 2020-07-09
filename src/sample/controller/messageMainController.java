@@ -12,10 +12,12 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import sample.model.Client;
 import sample.model.Contact;
+import sample.model.CustomTab;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.ResourceBundle;
 
 import static sample.model.Contact.parser;
@@ -48,7 +50,10 @@ public class messageMainController implements Initializable
         refreshList();
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("../layout/messengerTab.fxml"));
-        Tab newConnection = new Tab("Friend-XXX", loader.load());
+        Tab newConnection = new Tab(newPerson.getFirstName(), loader.load());
+        newConnection.setId(Integer.toString(newPerson.getContactNumber()));
+
+        messageTabController controller = loader.load();
 
         tabHolder.getTabs().add(newConnection);
     }

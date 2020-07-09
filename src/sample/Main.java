@@ -8,6 +8,11 @@ import javafx.stage.Stage;
 import sample.controller.messageMainController;
 import sample.model.Client;
 
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+
 public class Main extends Application {
 
     @Override
@@ -18,16 +23,18 @@ public class Main extends Application {
         // load current layout and designate as 'Parent'
         Parent root = loader.load();
 
+        String clientAddress = getAddressInfo();
+
         // instantiate 'Client' model to handle Socket transactions
-        Client client = new Client ("192.168.1.10", "192.168.1.41", 8405);
+//        Client client = new Client (clientAddress, "192.168.1.41", 8405);
         // Client must be given its own thread or it will end the JavaFX 'Main' thread beyond this point
-        Thread background = new Thread (client);
+//        Thread background = new Thread (client);
         // Client now runs in background and takes care of receiving messages from server
-        background.start();
+//        background.start();
 
         // Passing Client to controller allows 'SendMessage' functionality
         messageMainController controller = loader.getController();
-        controller.setClient(client);
+//        controller.setClient(client);
 
         // staging
         primaryStage.setTitle("Messaging App");
@@ -35,6 +42,14 @@ public class Main extends Application {
         primaryStage.show();
     }
 
+    public String getAddressInfo () throws IOException // connecting through Socket may throw Exception
+    {
+        Socket socket = new Socket ();
+        socket.connect(new InetSocketAddress("google.com", 80));
+        String IP = socket.getLocalAddress().toString();
+
+        return IP.trim().replaceAll("[^.0-9]","");
+    }
 
     public static void main(String[] args) {
         launch(args);
