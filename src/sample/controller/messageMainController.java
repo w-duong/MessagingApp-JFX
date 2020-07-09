@@ -10,6 +10,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import sample.model.Client;
 import sample.model.Contact;
 
 import java.io.IOException;
@@ -21,6 +22,8 @@ import static sample.model.Contact.parser;
 
 public class messageMainController implements Initializable
 {
+    Client client;
+
     @FXML
     ListView<Contact> messageNow;
     @FXML
@@ -30,6 +33,8 @@ public class messageMainController implements Initializable
 
     private ObservableList<Contact> onlineNow = FXCollections.observableArrayList();
     private ObservableList<Contact> contacts = FXCollections.observableArrayList();
+
+    public void setClient (Client client) { this.client = client; }
 
     public void menuNewConnection (ActionEvent event) throws IOException // REQUIRED: creating new Tab may cause exception
     {
@@ -47,7 +52,6 @@ public class messageMainController implements Initializable
 
         tabHolder.getTabs().add(newConnection);
     }
-
 
     public void menuClose (ActionEvent event)
     {

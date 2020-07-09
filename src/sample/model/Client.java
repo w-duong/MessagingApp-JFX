@@ -4,16 +4,13 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
-public class Client
+public class Client implements Runnable
 {
-    private static final Scanner cin = new Scanner (System.in);
-
     // CLIENT VARIABLES:
     private String serverName;
     private Socket commsLine;           // Socket for communications
     private DataInputStream comingIn;   // Stream coming in externally
     private DataOutputStream goingOut;  // Stream going out to server
-    private Thread readMessage;
 
     public Client (String selfIdentifier, String serverName, int serverPort) throws IOException
     {
@@ -21,6 +18,9 @@ public class Client
         // InetAddress ip = InetAddress.getByName("localhost"); // (1)
 
         commsLine = new Socket(serverName, serverPort);
+        setServerName(serverName);
+        comingIn = new DataInputStream(commsLine.getInputStream());
+        goingOut = new DataOutputStream(commsLine.getOutputStream());
         try
         {
             goingOut.writeUTF(selfIdentifier);
@@ -29,18 +29,12 @@ public class Client
         {
             System.out.println (e.getMessage());
         }
-
-        setServerName(serverName);
-        setComingIn((DataInputStream)commsLine.getInputStream());
-        setGoingOut((DataOutputStream)commsLine.getOutputStream());
-
-        start();
     }
 
-    public void setCommsLine (Socket commsLine) { this.commsLine = commsLine; }
     public void setServerName (String serverName) { this.serverName = serverName; }
-    public void setComingIn (DataInputStream comingIn) { this.comingIn = comingIn; }
-    public void setGoingOut (DataOutputStream goingOut) { this.goingOut = goingOut; }
+
+    // previously, we needed another background Thread to handle sending messages but with JavaFX as the main thread,
+    // we can simply treat the 'Client' model as its own Thread
     public void sendMessage (String packet)
     {
         try
@@ -53,40 +47,30 @@ public class Client
         }
     }
 
-    public void start () throws IOException
+    @Override
+    public void run ()
     {
-        // SPAWN NEW THREAD TO HANDLE INCOMING MESSAGES
-        readMessage = new Thread (new Runnable() {
-            boolean exit = false;
-
-            @Override
-            public void run()
+        boolean exit = false;
+        while (!exit)
+        {
+            try
             {
-                while (!exit)
+                String messageIn = comingIn.readUTF();
+                if (messageIn.equals("LOGOUT"))
                 {
-                    try
-                    {
-                        String messageIn = comingIn.readUTF();
-                        if (messageIn.equals("LOGOUT"))
-                        {
-                            goingOut.close();
-                            comingIn.close();
+                    goingOut.close();
+                    comingIn.close();
+                    commsLine.close();
 
-                            this.exit = true;
-                        }
-
-                        System.out.println (messageIn);
-                    }
-                    catch (Exception e)
-                    {
-                        System.out.println (e.getMessage());
-                    }
+                    exit = true;
                 }
+
+                System.out.println (messageIn);
             }
-
-            public void stop () { this.exit = true; }
-        });
-
-        readMessage.start();
+            catch (Exception e)
+            {
+                System.out.println (e.getMessage());
+            }
+        }
     }
 }
