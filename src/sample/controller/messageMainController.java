@@ -56,10 +56,14 @@ public class messageMainController implements Initializable
         newConnection.setId(newPerson.getContactNumber());
 
         tabHolder.getTabs().add(newConnection);
+
+        client.setTabPane(tabHolder);
     }
 
     public void menuClose (ActionEvent event)
     {
+        client.sendMessage("EXIT");
+
         Platform.exit();
         System.exit(0);
     }

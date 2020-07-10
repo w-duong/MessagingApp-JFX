@@ -1,11 +1,21 @@
 package sample.model;
 
+import javafx.scene.Node;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
+import javafx.scene.paint.Paint;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
+
 import java.io.*;
 import java.net.*;
 import java.util.*;
 
 public class Client implements Runnable
 {
+    // MISC:
+    TabPane tabPane;
+
     // CLIENT VARIABLES:
     private String serverName;
     private Socket commsLine;           // Socket for communications
@@ -47,6 +57,7 @@ public class Client implements Runnable
         }
     }
     public String getServerName () { return this.serverName; }
+    public void setTabPane (TabPane tabPane) { this.tabPane = tabPane; }
 
     @Override
     public void run ()
@@ -66,7 +77,20 @@ public class Client implements Runnable
                     exit = true;
                 }
 
-                System.out.println (messageIn);
+                String [] array = messageIn.split("@");
+
+                for (Tab tab : tabPane.getTabs())
+                    if (tab.getId() == array[1])
+                    {
+                        Text chatLine = new Text(tab.getText() + " > " + array[0] + "\n");
+                        chatLine.setFill(Paint.valueOf("Red"));
+
+                        Node node = tab.getContent();
+                        TextFlow chatLog = (TextFlow) node.lookup("ChatLog");
+                        chatLog.getChildren().add(chatLine);
+
+                        break;
+                    }
             }
             catch (Exception e)
             {

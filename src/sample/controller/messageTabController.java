@@ -42,11 +42,11 @@ public class messageTabController
             Text chatLine = new Text("You > " + message + "\n");
             chatLine.setFill(Paint.valueOf("Blue"));
 
+            inputMessageField.clear();
+
             ChatLog.getChildren().add(chatLine);
 
-            System.out.println (message + "@" + id);
-
-            inputMessageField.clear();
+            CustomTab.client.sendMessage (message + "@" + id);
         }
     }
 }

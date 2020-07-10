@@ -5,6 +5,7 @@ import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.text.TextFlow;
 
 public class CustomTab extends Tab
 {
