@@ -34,7 +34,7 @@ public class messageTabController
 
     public void sendMessageSignal ()
     {
-        String id = CustomTab.tabPane.getSelectionModel().getSelectedItem().getId();
+        String recipient = CustomTab.tabPane.getSelectionModel().getSelectedItem().getId();
 
         if (!inputMessageField.getText().equals("") && !inputMessageField.getText().equals(null))
         {
@@ -46,7 +46,7 @@ public class messageTabController
 
             ChatLog.getChildren().add(chatLine);
 
-            CustomTab.client.sendMessage (message + "@" + id);
+            CustomTab.client.sendMessage (message + "@" + recipient + "@" + CustomTab.client.getSelfIdentifier());
         }
     }
 }

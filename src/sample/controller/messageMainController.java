@@ -51,7 +51,7 @@ public class messageMainController implements Initializable
 
         refreshList();
 
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("../layout/messengerTab.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("messengerTab.fxml"));
         CustomTab newConnection = new CustomTab(newPerson.getFirstName(), loader.load(), tabHolder, client);
         newConnection.setId(newPerson.getContactNumber());
 

@@ -18,6 +18,7 @@ public class Client implements Runnable
 
     // CLIENT VARIABLES:
     private String serverName;
+    private String selfIdentifier;
     private Socket commsLine;           // Socket for communications
     private DataInputStream comingIn;   // Stream coming in externally
     private DataOutputStream goingOut;  // Stream going out to server
@@ -28,6 +29,7 @@ public class Client implements Runnable
         // InetAddress ip = InetAddress.getByName("localhost"); // (1)
 
         commsLine = new Socket(serverName, serverPort);
+        setSelfIdentifier(selfIdentifier);
         setServerName(serverName);
         comingIn = new DataInputStream(commsLine.getInputStream());
         goingOut = new DataOutputStream(commsLine.getOutputStream());
@@ -41,6 +43,7 @@ public class Client implements Runnable
         }
     }
 
+    public void setSelfIdentifier (String selfIdentifier) { this.selfIdentifier = selfIdentifier; }
     public void setServerName (String serverName) { this.serverName = serverName; }
 
     // previously, we needed another background Thread to handle sending messages but with JavaFX as the main thread,
@@ -49,6 +52,7 @@ public class Client implements Runnable
     {
         try
         {
+            System.out.println("Outgoing > " + packet);
             goingOut.writeUTF(packet);
         }
         catch (Exception e)
@@ -56,6 +60,8 @@ public class Client implements Runnable
             System.out.println(e.getMessage());
         }
     }
+
+    public String getSelfIdentifier () {return this.selfIdentifier; }
     public String getServerName () { return this.serverName; }
     public void setTabPane (TabPane tabPane) { this.tabPane = tabPane; }
 
@@ -68,6 +74,7 @@ public class Client implements Runnable
             try
             {
                 String messageIn = comingIn.readUTF();
+                System.out.println("incoming > " + messageIn);
                 if (messageIn.equals("LOGOUT"))
                 {
                     goingOut.close();
@@ -80,13 +87,14 @@ public class Client implements Runnable
                 String [] array = messageIn.split("@");
 
                 for (Tab tab : tabPane.getTabs())
-                    if (tab.getId() == array[1])
+                    if (tab.getId().equals(array[2]))
                     {
+                        System.out.println("this is the tab " + tab.getId());
                         Text chatLine = new Text(tab.getText() + " > " + array[0] + "\n");
                         chatLine.setFill(Paint.valueOf("Red"));
 
                         Node node = tab.getContent();
-                        TextFlow chatLog = (TextFlow) node.lookup("ChatLog");
+                        TextFlow chatLog = (TextFlow) node.lookup("#ChatLog");
                         chatLog.getChildren().add(chatLine);
 
                         break;
