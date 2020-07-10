@@ -7,6 +7,8 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.text.TextFlow;
 
+/* Custom Class only needed as wrapper to allow access to Client (for communications over Socket)
+and TabPane (for access to identifiers within Tab group) */
 public class CustomTab extends Tab
 {
     public static Client client;

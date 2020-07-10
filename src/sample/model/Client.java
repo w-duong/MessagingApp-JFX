@@ -1,5 +1,6 @@
 package sample.model;
 
+import javafx.application.Platform;
 import javafx.scene.Node;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -33,6 +34,8 @@ public class Client implements Runnable
         setServerName(serverName);
         comingIn = new DataInputStream(commsLine.getInputStream());
         goingOut = new DataOutputStream(commsLine.getOutputStream());
+
+        /* Need to write out identifier of Client to Server to join list of online Clients (kept Server side) */
         try
         {
             goingOut.writeUTF(selfIdentifier);
@@ -46,13 +49,13 @@ public class Client implements Runnable
     public void setSelfIdentifier (String selfIdentifier) { this.selfIdentifier = selfIdentifier; }
     public void setServerName (String serverName) { this.serverName = serverName; }
 
-    // previously, we needed another background Thread to handle sending messages but with JavaFX as the main thread,
-    // we can simply treat the 'Client' model as its own Thread
+
+    /* previously, we needed another background Thread to handle sending messages but with JavaFX as the main thread,
+       we can simply treat the 'Client' model as its own Thread */
     public void sendMessage (String packet)
     {
         try
         {
-            System.out.println("Outgoing > " + packet);
             goingOut.writeUTF(packet);
         }
         catch (Exception e)
@@ -74,7 +77,6 @@ public class Client implements Runnable
             try
             {
                 String messageIn = comingIn.readUTF();
-                System.out.println("incoming > " + messageIn);
                 if (messageIn.equals("LOGOUT"))
                 {
                     goingOut.close();
@@ -84,18 +86,22 @@ public class Client implements Runnable
                     exit = true;
                 }
 
+                /* parse message for body-recipient-sender */
                 String [] array = messageIn.split("@");
 
+                /* sort through Tab group within TabPane and identify correct sender */
                 for (Tab tab : tabPane.getTabs())
                     if (tab.getId().equals(array[2]))
                     {
-                        System.out.println("this is the tab " + tab.getId());
                         Text chatLine = new Text(tab.getText() + " > " + array[0] + "\n");
                         chatLine.setFill(Paint.valueOf("Red"));
 
                         Node node = tab.getContent();
                         TextFlow chatLog = (TextFlow) node.lookup("#ChatLog");
-                        chatLog.getChildren().add(chatLine);
+
+                        /* Any changes in JavaFX GUI must be done by JavaFX Thread. Since Client is its own background
+                        *  thread, we should use Platform.runLater and lambda function (the latter for brevity) */
+                        Platform.runLater(() -> chatLog.getChildren().add(chatLine));
 
                         break;
                     }

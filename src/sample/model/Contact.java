@@ -7,6 +7,7 @@ public class Contact
     private String contactNumber;
     boolean online = false;
 
+    /* CONSTRUCTORS */
     public Contact () {}
     public Contact (String firstName, String lastName, String contactNumber)
     {
@@ -15,11 +16,13 @@ public class Contact
         setContactNumber(contactNumber);
     }
 
+    /* MUTATORS */
     public void setFirstName (String firstName) { this.firstName = firstName; }
     public void setLastName (String lastName) { this.lastName = lastName; }
     public void setContactNumber (String contactNumber) { this.contactNumber = contactNumber; }
     public void setOnline (boolean online) { this.online = online; }
 
+    /* ACCESSORS */
     public String getFirstName () { return this.firstName; }
     public String getLastName () { return this.lastName; }
     public String getContactNumber () { return this.contactNumber; }
@@ -31,6 +34,7 @@ public class Contact
         return String.format ("%s@%s", firstName, contactNumber);
     }
 
+    /* For parsing String argument into elements of Contact info */
     public static Contact parser (String personalInfo)
     {
         Contact newPerson = new Contact ();
