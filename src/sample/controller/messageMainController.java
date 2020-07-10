@@ -9,6 +9,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
 import javafx.scene.control.*;
 import sample.model.Client;
 import sample.model.Contact;
@@ -41,6 +42,7 @@ public class messageMainController implements Initializable
     public void menuNewConnection (ActionEvent event) throws IOException // REQUIRED: creating new Tab may cause exception
     {
         TextInputDialog getContactID = new TextInputDialog("example: FirstName LastName@ContactNumber");
+        getContactID.setResizable(true);
         getContactID.setHeaderText("Enter Contact Info");
 
         getContactID.showAndWait();
@@ -50,10 +52,8 @@ public class messageMainController implements Initializable
         refreshList();
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("../layout/messengerTab.fxml"));
-        Tab newConnection = new Tab(newPerson.getFirstName(), loader.load());
-        newConnection.setId(Integer.toString(newPerson.getContactNumber()));
-
-        messageTabController controller = loader.load();
+        CustomTab newConnection = new CustomTab(newPerson.getFirstName(), loader.load(), tabHolder, client);
+        newConnection.setId(newPerson.getContactNumber());
 
         tabHolder.getTabs().add(newConnection);
     }
@@ -80,9 +80,9 @@ public class messageMainController implements Initializable
         tabHolder.setTabClosingPolicy(TabPane.TabClosingPolicy.ALL_TABS);
 
         // EXAMPLES
-        contacts.add(new Contact("William", "Duong", 5840559));
-        contacts.add(new Contact ("Jackie", "Duong", 8132974));
-        contacts.add(new Contact ("Jennifer", "Duong", 4662459));
+        contacts.add(new Contact("William", "Duong", "192.168.1.10"));
+        contacts.add(new Contact ("Jackie", "Duong", "192.168.1.46"));
+        contacts.add(new Contact ("Jennifer", "Duong", "192.168.1.41"));
 
         contacts.get(1).setOnline(true);
 

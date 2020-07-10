@@ -1,19 +1,20 @@
 package sample.model;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 
 public class CustomTab extends Tab
 {
-    public static String tabIdentifier;
+    public static Client client;
+    public static TabPane tabPane;
 
-    public CustomTab (String title, Node node, int identifier)
+    public CustomTab (String title, Node node, TabPane tabPane, Client client)
     {
         super(title, node);
-        setTabIdentifier(identifier);
+        this.tabPane = tabPane;
+        this.client = client;
     }
-
-    public void setTabIdentifier (String identifier) { this.tabIdentifier = identifier; }
-    public void setTabIdentifier (int identifier) { this.tabIdentifier = Integer.toString(identifier); }
-    public String getTabIdentifier () { return this.tabIdentifier; }
 }

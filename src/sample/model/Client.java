@@ -46,6 +46,7 @@ public class Client implements Runnable
             System.out.println(e.getMessage());
         }
     }
+    public String getServerName () { return this.serverName; }
 
     @Override
     public void run ()
