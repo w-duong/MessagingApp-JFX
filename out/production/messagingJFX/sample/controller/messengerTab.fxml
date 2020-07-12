@@ -13,7 +13,7 @@
          </content>
       </ScrollPane>
       <TextArea fx:id="inputMessageField" layoutX="14.0" layoutY="440.0" onKeyPressed="#keypressSendButton" prefHeight="43.0" prefWidth="372.0" promptText="Enter message here... (Shift+Enter to send)" wrapText="true" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" />
-      <ImageView fitHeight="30.0" fitWidth="36.0" layoutX="347.0" layoutY="451.0" onMouseClicked="#justKidding" pickOnBounds="true" preserveRatio="true">
+      <ImageView fitHeight="30.0" fitWidth="36.0" layoutX="347.0" layoutY="451.0" onMouseClicked="#mouseSendButton" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../resources/833569.png" />
          </image>

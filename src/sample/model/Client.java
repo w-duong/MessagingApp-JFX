@@ -21,8 +21,8 @@ public class Client implements Runnable
     private String serverName;
     private String selfIdentifier;
     private Socket commsLine;           // Socket for communications
-    private DataInputStream comingIn;   // Stream coming in externally
-    private DataOutputStream goingOut;  // Stream going out to server
+    private BufferedReader comingIn;    // Stream coming in externally
+    private PrintWriter goingOut;       // Stream going out to server
 
     public Client (String selfIdentifier, String serverName, int serverPort) throws IOException
     {
@@ -32,13 +32,14 @@ public class Client implements Runnable
         commsLine = new Socket(serverName, serverPort);
         setSelfIdentifier(selfIdentifier);
         setServerName(serverName);
-        comingIn = new DataInputStream(commsLine.getInputStream());
-        goingOut = new DataOutputStream(commsLine.getOutputStream());
+        comingIn = new BufferedReader(new InputStreamReader(commsLine.getInputStream()));
+        goingOut = new PrintWriter(commsLine.getOutputStream());
 
         /* Need to write out identifier of Client to Server to join list of online Clients (kept Server side) */
         try
         {
-            goingOut.writeUTF(selfIdentifier);
+            goingOut.write(selfIdentifier);
+            goingOut.flush();
         }
         catch (Exception e)
         {
@@ -56,7 +57,8 @@ public class Client implements Runnable
     {
         try
         {
-            goingOut.writeUTF(packet);
+            goingOut.write(packet);
+            goingOut.flush();
         }
         catch (Exception e)
         {
@@ -76,7 +78,7 @@ public class Client implements Runnable
         {
             try
             {
-                String messageIn = comingIn.readUTF();
+                String messageIn = comingIn.readLine();
                 if (messageIn.equals("LOGOUT"))
                 {
                     goingOut.close();
@@ -88,6 +90,9 @@ public class Client implements Runnable
 
                 /* parse message for body-recipient-sender */
                 String [] array = messageIn.split("@");
+
+                for (String packets : array)
+                    System.out.println (packets);
 
                 /* sort through Tab group within TabPane and identify correct sender */
                 for (Tab tab : tabPane.getTabs())

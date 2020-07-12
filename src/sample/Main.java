@@ -19,14 +19,14 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception
     {
         // instantiate loader to unpack .fxml layout
-        FXMLLoader loader = new FXMLLoader (getClass().getResource("layout/messageMain.fxml"));
+        FXMLLoader loader = new FXMLLoader (getClass().getResource("controller/messageMain.fxml"));
         // load current layout and designate as 'Parent'
         Parent root = loader.load();
 
         String clientAddress = getAddressInfo();
 
         // instantiate 'Client' model to handle Socket transactions
-        Client client = new Client (clientAddress, "192.168.1.46", 8405);
+        Client client = new Client (clientAddress, "192.168.1.61", 8405);
         // Client must be given its own thread or it will end the JavaFX 'Main' thread beyond this point
         Thread background = new Thread (client);
         // Client now runs in background and takes care of receiving messages from server
