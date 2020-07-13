@@ -14,8 +14,8 @@ using namespace std;
 const char LOGOUT [] = "LOGOUT";
 int status = WL_IDLE_STATUS;
 
-char ssid[] = "BadKarmaAP_N"; //  your network SSID (name) 
-char pass[] = "36Burningman!1";    // your network password (use for WPA, or use as key for WEP)
+char ssid[] = "Network SSID"; //  your network SSID (name) 
+char pass[] = "Network Password";    // your network password (use for WPA, or use as key for WEP)
 
 class WorkerThread
 {
