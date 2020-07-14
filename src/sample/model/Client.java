@@ -86,6 +86,7 @@ public class Client implements Runnable
                     commsLine.close();
 
                     exit = true;
+                    break;
                 }
 
                 /* parse message for body-recipient-sender */
@@ -98,7 +99,13 @@ public class Client implements Runnable
                 for (Tab tab : tabPane.getTabs())
                     if (tab.getId().equals(array[2]))
                     {
-                        Text chatLine = new Text(tab.getText() + " > " + array[0] + "\n");
+                        Text chatLine;
+
+                        if (array[0].equals("//FRIENDOUT") && array[1].equals("ALL"))
+                            chatLine = new Text(tab.getText() + " HAS LOGGED OUT.\n");
+                        else
+                            chatLine = new Text(tab.getText() + " > " + array[0] + "\n");
+
                         chatLine.setFill(Paint.valueOf("Red"));
 
                         Node node = tab.getContent();
