@@ -58,6 +58,8 @@ public class messageMainController implements Initializable
         tabHolder.getTabs().add(newConnection);
 
         client.setTabPane(tabHolder);
+        client.setContacts(contacts);
+        client.setOnlineNow(onlineNow);
     }
 
     public void menuClose (ActionEvent event)
@@ -82,13 +84,6 @@ public class messageMainController implements Initializable
     {
         // sets policy for tabs (method accepts enum of 'TabPane.TabClosingPolicy.xx')
         tabHolder.setTabClosingPolicy(TabPane.TabClosingPolicy.ALL_TABS);
-
-        // EXAMPLES
-        contacts.add(new Contact("William", "Duong", "192.168.1.10"));
-        contacts.add(new Contact ("Jackie", "Duong", "192.168.1.46"));
-        contacts.add(new Contact ("Jennifer", "Duong", "192.168.1.41"));
-
-        contacts.get(1).setOnline(true);
 
         messageLater.setItems(contacts);
 

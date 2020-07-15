@@ -4,9 +4,8 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
-public class Server
+public class Server_JVM
 {
-    //private static ArrayList<Thread> onlineClients = new ArrayList<>();
     private static Vector<WorkerThread> onlineClients = new Vector<>();
 
     public static void main (String [] args) throws IOException // Sockets throw exceptions (necessary)
@@ -58,6 +57,7 @@ public class Server
     {
         // MISCELLANEOUS:
         String serverParent = null;
+        ArrayList<WorkerThread> ipcList;
 
         // NECESSITIES:
         String identifier;          // User will define identifier (i.e. Name@ipaddress)
@@ -72,6 +72,7 @@ public class Server
             this.identifier = identifier;
             this.online = true;
             this.commsLine = assignedSocket;
+            this.ipcList = new ArrayList<>();
 
             this.comingIn = new DataInputStream(commsLine.getInputStream());    // could also have used 'assignedSocket'
             this.goingOut = new DataOutputStream(commsLine.getOutputStream());  // to create either Streams
@@ -84,6 +85,40 @@ public class Server
             {
                 System.out.println (e.getMessage());
             }
+        }
+
+        public void notifyFriends ()
+        {
+            String notification = "//FRIENDOUT@ALL@" + identifier;
+
+            for (WorkerThread friend : ipcList)
+            {
+                try
+                {
+                    friend.goingOut.writeUTF(notification);
+                    friend.removeOnlineFriend(this);
+                }
+                catch (Exception e)
+                {
+                    System.out.println (e.getMessage());
+                }
+            }
+        }
+
+        public void addOnlineFriend (WorkerThread secondPerson)
+        {
+            if (!ipcList.contains(secondPerson))
+                ipcList.add(secondPerson);
+
+            // secondPerson.addOnlineFriend(this);
+        }
+
+        public void removeOnlineFriend (WorkerThread secondPerson)
+        {
+            if (ipcList.contains(secondPerson))
+                ipcList.remove(secondPerson);
+
+            // secondPerson.removeOnlineFriend(this);
         }
 
         @Override
@@ -99,6 +134,7 @@ public class Server
                     // EXIT condition, NOTE: does not require @identifier suffix - server will not need it
                     if (fromClient.equals("EXIT"))
                     {
+                        notifyFriends();
                         goingOut.writeUTF("LOGOUT"); // reciprocal 'command' to have client shut down
 
                         this.online = false;
@@ -118,6 +154,7 @@ public class Server
                     for (WorkerThread client : onlineClients)
                         if (client.identifier.equals(recipient) && (client.online))
                         {
+                            addOnlineFriend(client);
                             client.goingOut.writeUTF(fromClient);
                             break;
                         }

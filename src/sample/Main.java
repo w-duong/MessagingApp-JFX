@@ -27,7 +27,7 @@ public class Main extends Application {
         String clientAddress = getAddressInfo();
 
         // instantiate 'Client' model to handle Socket transactions
-        Client client = new Client (clientAddress, "192.168.1.61", 8405);
+        Client client = new Client (clientAddress, "192.168.1.46", 8405);
         // Client must be given its own thread or it will end the JavaFX 'Main' thread beyond this point
         Thread background = new Thread (client);
         // Client now runs in background and takes care of receiving messages from server
