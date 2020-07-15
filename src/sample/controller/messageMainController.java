@@ -11,6 +11,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
 import sample.model.Client;
 import sample.model.Contact;
 import sample.model.CustomTab;
@@ -39,7 +40,7 @@ public class messageMainController implements Initializable
 
     public void setClient (Client client) { this.client = client; }
 
-    public void menuNewConnection (ActionEvent event) throws IOException // REQUIRED: creating new Tab may cause exception
+    public void menuNewConnection (ActionEvent event) throws IOException // REQUIRED: ...even when calling a function that throws
     {
         TextInputDialog getContactID = new TextInputDialog("example: FirstName LastName@ContactNumber");
         getContactID.setResizable(true);
@@ -47,19 +48,8 @@ public class messageMainController implements Initializable
 
         getContactID.showAndWait();
         Contact newPerson = Contact.parser (getContactID.getEditor().getText());
-        contacts.add(newPerson);
 
-        refreshList();
-
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("messengerTab.fxml"));
-        CustomTab newConnection = new CustomTab(newPerson.getFirstName(), loader.load(), tabHolder, client);
-        newConnection.setId(newPerson.getContactNumber());
-
-        tabHolder.getTabs().add(newConnection);
-
-        client.setTabPane(tabHolder);
-        client.setContacts(contacts);
-        client.setOnlineNow(onlineNow);
+        newConnection (newPerson);
     }
 
     public void menuClose (ActionEvent event)
@@ -68,6 +58,37 @@ public class messageMainController implements Initializable
 
         Platform.exit();
         System.exit(0);
+    }
+
+    public void newConnection (Contact person) throws IOException // REQUIRED: creating new Tab may cause exception
+    {
+        person.setOnline(true);
+        if (!contacts.contains(person))
+            contacts.add(person);
+
+        refreshList();
+
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("messengerTab.fxml"));
+        CustomTab newConnection = new CustomTab(person.getFirstName(), loader.load(), tabHolder, client);
+        newConnection.setId(person.getContactNumber());
+
+        tabHolder.getTabs().add(newConnection);
+
+        client.setTabPane(tabHolder);
+        client.setContacts(contacts);
+        client.setOnlineNow(onlineNow);
+    }
+
+    public void messageLaterDoubleClick (MouseEvent mouseEvent) throws IOException
+    {
+        if (mouseEvent.getClickCount() == 2)
+            newConnection (messageLater.getSelectionModel().getSelectedItem());
+    }
+
+    public void messageNowDoubleClick (MouseEvent mouseEvent) throws IOException
+    {
+        if (mouseEvent.getClickCount() == 2)
+            newConnection (messageNow.getSelectionModel().getSelectedItem());
     }
 
     public void refreshList ()
@@ -86,9 +107,12 @@ public class messageMainController implements Initializable
         tabHolder.setTabClosingPolicy(TabPane.TabClosingPolicy.ALL_TABS);
 
         messageLater.setItems(contacts);
+        messageLater.setStyle("-fx-text-fill: darkgray");
+        messageLater.setStyle("-fx-font-style: italic");
 
         refreshList();
 
         messageNow.setItems(onlineNow);
+        messageNow.setStyle("-fx-font-weight: bold");
     }
 }

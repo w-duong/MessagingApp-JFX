@@ -7,10 +7,10 @@
    <center>
       <AnchorPane prefHeight="500.0" prefWidth="600.0">
          <children>
-            <ListView fx:id="messageNow" prefHeight="250.0" prefWidth="194.0" AnchorPane.leftAnchor="6.0" AnchorPane.topAnchor="6.0" />
+            <ListView fx:id="messageNow" onContextMenuRequested="#messageNowDoubleClick" onMouseClicked="#messageNowDoubleClick" prefHeight="250.0" prefWidth="194.0" AnchorPane.leftAnchor="6.0" AnchorPane.topAnchor="6.0" />
             <TabPane fx:id="tabHolder" layoutX="200.0" prefHeight="525.0" prefWidth="400.0" tabClosingPolicy="UNAVAILABLE" />
             <Separator layoutY="261.0" prefHeight="3.0" prefWidth="193.0" AnchorPane.leftAnchor="6.0" />
-            <ListView fx:id="messageLater" layoutY="275.0" prefHeight="250.0" prefWidth="194.0" AnchorPane.bottomAnchor="6.0" AnchorPane.leftAnchor="6.0" />
+            <ListView fx:id="messageLater" layoutY="275.0" onContextMenuRequested="#messageLaterDoubleClick" onMouseClicked="#messageLaterDoubleClick" prefHeight="250.0" prefWidth="194.0" AnchorPane.bottomAnchor="6.0" AnchorPane.leftAnchor="6.0" />
          </children>
       </AnchorPane>
    </center>

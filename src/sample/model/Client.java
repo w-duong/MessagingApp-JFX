@@ -57,11 +57,15 @@ public class Client implements Runnable
         }
     }
 
+    /* ACCESSORS AND MUTATORS */
     public void setSelfIdentifier (String selfIdentifier) { this.selfIdentifier = selfIdentifier; }
     public void setServerName (String serverName) { this.serverName = serverName; }
     public void setContacts (ObservableList<Contact> contacts) { this.contacts = contacts; }
     public void setOnlineNow(ObservableList<Contact> onlineNow){ this.onlineNow= onlineNow;}
     public void setTabPane (TabPane tabPane) { this.tabPane = tabPane; }
+
+    public String getSelfIdentifier () {return this.selfIdentifier; }
+    public String getServerName () { return this.serverName; }
 
     /* previously, we needed another background Thread to handle sending messages but with JavaFX as the main thread,
        we can simply treat the 'Client' model as its own Thread */
@@ -78,6 +82,8 @@ public class Client implements Runnable
             System.out.println(e.getMessage());
         }
     }
+
+    /* Switches Contacts from currently online to offline in their respective ListViews */
     public void refreshList ()
     {
         for (Contact person : contacts)
@@ -86,9 +92,6 @@ public class Client implements Runnable
             else if (!person.isOnline() && onlineNow.contains(person))
                 onlineNow.remove(person);
     }
-
-    public String getSelfIdentifier () {return this.selfIdentifier; }
-    public String getServerName () { return this.serverName; }
 
     @Override
     public void run ()
@@ -123,6 +126,7 @@ public class Client implements Runnable
                         Text chatLine = null;
                         boolean isGoodTransmission = false;
 
+                        /* If message is a Server level command... */
                         if (array[0].equals("//FRIENDOUT") || array[0].equals("//FRIENDOFF"))
                         {
                             if (array[1].equals("ALL"))
@@ -130,6 +134,7 @@ public class Client implements Runnable
                             else if (array[1].equals("SERVER"))
                                 chatLine = new Text(tab.getText() + " is not currently logged on.\n");
 
+                            /* Removes appropriate Contact from currently online ListView */
                             for (Contact person : contacts)
                                 if (person.getContactNumber().equals(array[2]))
                                     person.setOnline(false);
@@ -155,6 +160,9 @@ public class Client implements Runnable
                         Text finalChatLine = chatLine;
                         Platform.runLater(() -> chatLog.getChildren().add(finalChatLine));
 
+                        /* In the event that this Client is receiving a message from a Contact who was PREVIOUSLY
+                        *  offline, refresh the ListView to update their status
+                        * */
                         if (isGoodTransmission)
                         {
                             for (Contact person : contacts)

@@ -15,6 +15,12 @@ public class Contact
         setLastName(lastName);
         setContactNumber(contactNumber);
     }
+    public Contact (Contact otherPerson)
+    {
+        setFirstName(otherPerson.getFirstName());
+        setLastName(otherPerson.getLastName());
+        setContactNumber(otherPerson.getContactNumber());
+    }
 
     /* MUTATORS */
     public void setFirstName (String firstName) { this.firstName = firstName; }
@@ -45,8 +51,6 @@ public class Contact
         newPerson.setFirstName(elements[0]);
         newPerson.setLastName(elements[1]);
         newPerson.setContactNumber(elements[2]);
-
-        newPerson.setOnline(true);
 
         return newPerson;
     }
