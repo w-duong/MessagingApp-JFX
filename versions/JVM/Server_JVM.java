@@ -151,13 +151,18 @@ public class Server_JVM
                     String sender = messageArray[2];
 
                     // iterate through Vector for unique ID of recipient and pass message if they're online
+                    boolean isGoodTransmission = false;
                     for (WorkerThread client : onlineClients)
                         if (client.identifier.equals(recipient) && (client.online))
                         {
                             addOnlineFriend(client);
                             client.goingOut.writeUTF(fromClient);
+                            isGoodTransmission = true;
                             break;
                         }
+                    
+                    if (!isGoodTransmission)
+                        goingOut.writeUTF("//FRIENDOFF@SERVER@" + recipient);
                 }
                 catch (Exception e)
                 {

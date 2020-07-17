@@ -1,6 +1,9 @@
 package sample.model;
 
 import javafx.application.Platform;
+import javafx.beans.Observable;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -16,11 +19,15 @@ public class Client implements Runnable
 {
     // MISC:
     TabPane tabPane;
+    private ObservableList<Contact> contacts = FXCollections.observableArrayList();
+    private ObservableList<Contact> onlineNow = FXCollections.observableArrayList();
 
     // CLIENT VARIABLES:
     private String serverName;
     private String selfIdentifier;
     private Socket commsLine;           // Socket for communications
+//    private BufferedReader comingIn;    // Stream coming in externally
+//    private PrintWriter goingOut;       // Stream going out to server
     private DataInputStream comingIn;
     private DataOutputStream goingOut;
 
@@ -32,12 +39,16 @@ public class Client implements Runnable
         commsLine = new Socket(serverName, serverPort);
         setSelfIdentifier(selfIdentifier);
         setServerName(serverName);
+//        comingIn = new BufferedReader(new InputStreamReader(commsLine.getInputStream()));
+//        goingOut = new PrintWriter(commsLine.getOutputStream());
         comingIn = new DataInputStream(commsLine.getInputStream());
         goingOut = new DataOutputStream(commsLine.getOutputStream());
 
         /* Need to write out identifier of Client to Server to join list of online Clients (kept Server side) */
         try
         {
+//            goingOut.write(selfIdentifier);
+//            goingOut.flush();
             goingOut.writeUTF(selfIdentifier);
         }
         catch (Exception e)
@@ -46,9 +57,15 @@ public class Client implements Runnable
         }
     }
 
+    /* ACCESSORS AND MUTATORS */
     public void setSelfIdentifier (String selfIdentifier) { this.selfIdentifier = selfIdentifier; }
     public void setServerName (String serverName) { this.serverName = serverName; }
+    public void setContacts (ObservableList<Contact> contacts) { this.contacts = contacts; }
+    public void setOnlineNow(ObservableList<Contact> onlineNow){ this.onlineNow= onlineNow;}
+    public void setTabPane (TabPane tabPane) { this.tabPane = tabPane; }
 
+    public String getSelfIdentifier () {return this.selfIdentifier; }
+    public String getServerName () { return this.serverName; }
 
     /* previously, we needed another background Thread to handle sending messages but with JavaFX as the main thread,
        we can simply treat the 'Client' model as its own Thread */
@@ -56,6 +73,8 @@ public class Client implements Runnable
     {
         try
         {
+//            goingOut.write(packet);
+//            goingOut.flush();
             goingOut.writeUTF(packet);
         }
         catch (Exception e)
@@ -64,9 +83,15 @@ public class Client implements Runnable
         }
     }
 
-    public String getSelfIdentifier () {return this.selfIdentifier; }
-    public String getServerName () { return this.serverName; }
-    public void setTabPane (TabPane tabPane) { this.tabPane = tabPane; }
+    /* Switches Contacts from currently online to offline in their respective ListViews */
+    public void refreshList ()
+    {
+        for (Contact person : contacts)
+            if (person.isOnline() && !onlineNow.contains(person))
+                onlineNow.add(person);
+            else if (!person.isOnline() && onlineNow.contains(person))
+                onlineNow.remove(person);
+    }
 
     @Override
     public void run ()
@@ -76,6 +101,7 @@ public class Client implements Runnable
         {
             try
             {
+//                String messageIn = comingIn.readLine();
                 String messageIn = comingIn.readUTF();
                 if (messageIn.equals("LOGOUT"))
                 {
@@ -97,12 +123,29 @@ public class Client implements Runnable
                 for (Tab tab : tabPane.getTabs())
                     if (tab.getId().equals(array[2]))
                     {
-                        Text chatLine;
+                        Text chatLine = null;
+                        boolean isGoodTransmission = false;
 
-                        if (array[0].equals("//FRIENDOUT") && array[1].equals("ALL"))
-                            chatLine = new Text(tab.getText() + " HAS LOGGED OUT.\n");
+                        /* If message is a Server level command... */
+                        if (array[0].equals("//FRIENDOUT") || array[0].equals("//FRIENDOFF"))
+                        {
+                            if (array[1].equals("ALL"))
+                                chatLine = new Text(tab.getText() + " has logged off.\n");
+                            else if (array[1].equals("SERVER"))
+                                chatLine = new Text(tab.getText() + " is not currently logged on.\n");
+
+                            /* Removes appropriate Contact from currently online ListView */
+                            for (Contact person : contacts)
+                                if (person.getContactNumber().equals(array[2]))
+                                    person.setOnline(false);
+
+                            Platform.runLater(() -> refreshList());
+                        }
                         else
+                        {
                             chatLine = new Text(tab.getText() + " > " + array[0] + "\n");
+                            isGoodTransmission = true;
+                        }
 
                         chatLine.setFill(Paint.valueOf("Red"));
 
@@ -110,9 +153,24 @@ public class Client implements Runnable
                         TextFlow chatLog = (TextFlow) node.lookup("#ChatLog");
 
                         /* Any changes in JavaFX GUI must be done by JavaFX Thread. Since Client is its own background
-                        *  thread, we should use Platform.runLater and lambda function (the latter for brevity) */
-                        Platform.runLater(() -> chatLog.getChildren().add(chatLine));
+                        *  thread, we should use Platform.runLater and lambda function (the latter for brevity).
+                        *  Also, any local variables referenced above and used in lambda expression should be 'final' or
+                        *  converted to 'final'
+                        */
+                        Text finalChatLine = chatLine;
+                        Platform.runLater(() -> chatLog.getChildren().add(finalChatLine));
 
+                        /* In the event that this Client is receiving a message from a Contact who was PREVIOUSLY
+                        *  offline, refresh the ListView to update their status
+                        * */
+                        if (isGoodTransmission)
+                        {
+                            for (Contact person : contacts)
+                                if (person.getContactNumber().equals(array[2]) && !person.isOnline())
+                                    person.setOnline(true);
+
+                            Platform.runLater(() -> refreshList());
+                        }
                         break;
                     }
             }
