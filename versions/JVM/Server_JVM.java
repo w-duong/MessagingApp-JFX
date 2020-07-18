@@ -152,11 +152,22 @@ public class Server_JVM
 
                     // iterate through Vector for unique ID of recipient and pass message if they're online
                     boolean isGoodTransmission = false;
-                    for (WorkerThread client : onlineClients)
-                        if (client.identifier.equals(recipient) && (client.online))
+                    for (WorkerThread toClient : onlineClients)
+                        if (toClient.identifier.equals(recipient) && (toClient.online))
                         {
-                            addOnlineFriend(client);
-                            client.goingOut.writeUTF(fromClient);
+                            addOnlineFriend(toClient);
+
+                            if (message.contains("//FRIENDFILE"))
+                            {
+                                goingOut.writeUTF("ACKNSEND");
+                                toClient.goingOut.writeUTF(fromClient);
+
+                                long sizeOfFile = comingIn.readLong();
+                                fileTransfer(toClient, sizeOfFile);
+                            }
+                            else
+                                toClient.goingOut.writeUTF(fromClient);
+                            
                             isGoodTransmission = true;
                             break;
                         }
@@ -170,5 +181,32 @@ public class Server_JVM
                 }
             }
         }
+
+        public void fileTransfer (WorkerThread recipient, long sizeOfFile) throws Exception
+        {
+            try
+            {
+                recipient.goingOut.writeLong(sizeOfFile);
+
+                byte [] transientBuffer = new byte [4096];
+                int readEachTime = 0;
+                int soFar = 0;
+
+                while ((sizeOfFile > soFar) && ((readEachTime = comingIn.read(transientBuffer, 0, transientBuffer.length)) > 0))
+                {
+                    recipient.goingOut.write(transientBuffer, 0, readEachTime);
+                    soFar += readEachTime;
+
+                    System.out.println ("Read from Client 1 > " + soFar);
+                }
+
+                goingOut.flush();
+            }
+            catch (Exception e)
+            {
+                System.out.println (e.getMessage());
+            }
+        }
+
     }
 }

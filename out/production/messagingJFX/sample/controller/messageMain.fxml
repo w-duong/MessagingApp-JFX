@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.*?>
+<?import javafx.scene.input.*?>
 <?import javafx.scene.layout.*?>
 
 <BorderPane xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.controller.messageMainController">
@@ -19,8 +20,11 @@
         <menus>
           <Menu mnemonicParsing="false" text="File">
             <items>
-                  <MenuItem mnemonicParsing="false" onAction="#menuNewConnection" text="New Connection" />
-                  <MenuItem mnemonicParsing="false" text="Send File" />
+                  <MenuItem mnemonicParsing="false" onAction="#menuNewConnection" text="New Connection">
+                     <accelerator>
+                        <KeyCodeCombination alt="UP" code="N" control="ANY" meta="UP" shift="UP" shortcut="UP" />
+                     </accelerator></MenuItem>
+                  <MenuItem mnemonicParsing="false" onAction="#menuSendFile" text="Send File" />
               <MenuItem mnemonicParsing="false" onAction="#menuClose" text="Close" />
             </items>
           </Menu>

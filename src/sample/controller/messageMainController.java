@@ -1,7 +1,8 @@
 package sample.controller;
 
 import javafx.application.Platform;
-import javafx.beans.Observable;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -12,10 +13,12 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
+import javafx.stage.FileChooser;
 import sample.model.Client;
 import sample.model.Contact;
 import sample.model.CustomTab;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -50,6 +53,32 @@ public class messageMainController implements Initializable
         Contact newPerson = Contact.parser (getContactID.getEditor().getText());
 
         newConnection (newPerson);
+    }
+
+    public void menuSendFile (ActionEvent event) throws Exception
+    {
+        if (CustomTab.tabCount == 0)
+        {
+            Alert popup = new Alert (Alert.AlertType.ERROR, "No Contact Tabs Available");
+            popup.setHeaderText(null);
+            popup.show();
+            return;
+        }
+
+        FileChooser fileChooser = new FileChooser();
+        File selectedFile = fileChooser.showOpenDialog(null);
+
+        if (selectedFile != null)
+        {
+            String fileName = selectedFile.getName();
+            String filePath = selectedFile.getAbsolutePath();
+
+            String recipient = CustomTab.tabPane.getSelectionModel().getSelectedItem().getId();
+            String sender = CustomTab.client.getSelfIdentifier();
+
+            CustomTab.client.sendMessage (String.format ("//FRIENDFILE>>:%s@%s@%s", fileName, recipient, sender) );
+            CustomTab.client.sendFile(filePath);
+        }
     }
 
     public void menuClose (ActionEvent event)

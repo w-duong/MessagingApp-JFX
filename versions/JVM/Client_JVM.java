@@ -83,6 +83,69 @@ public class Client implements Runnable
         }
     }
 
+    public void sendFile (String absolutePath) throws Exception
+    {
+        try
+        {
+            File outboundFile = new File (absolutePath);
+            FileInputStream fstream = new FileInputStream(outboundFile);
+            BufferedInputStream bfstream = new BufferedInputStream (fstream);
+
+            byte [] sendBuffer = new byte [4096];
+            int remaining = 0;
+            int soFar = 0;
+
+            long sizeOfFile = outboundFile.length();
+            goingOut.writeLong(sizeOfFile);
+
+            while ((remaining = bfstream.read(sendBuffer, 0, sendBuffer.length)) > 0)
+            {
+                goingOut.write(sendBuffer, 0, remaining);
+                soFar += remaining;
+                System.out.println ("Amount of data sent > " + soFar);
+            }
+
+            goingOut.flush();
+            bfstream.close();
+            fstream.close();
+        }
+        catch (Exception e)
+        {
+            System.out.println (e.getMessage());
+        }
+    }
+
+    public void recvFile (String fileName) throws Exception
+    {
+        String path = "/Desktop/" + fileName;
+
+        try
+        {
+            File incomingFile = new File (System.getProperty("user.home"), path);
+            OutputStream writeToFile = new FileOutputStream (incomingFile);
+
+            byte [] readBuffer = new byte [1024];
+            int readEachTime = 0;
+            int soFar = 0;
+
+            long sizeOfFile = comingIn.readLong();
+
+            while ((sizeOfFile > soFar) && ((readEachTime = comingIn.read(readBuffer, 0, readBuffer.length)) > 0))
+            {
+                writeToFile.write(readBuffer, 0, readEachTime);
+                soFar += readEachTime;
+
+                System.out.println ("Read from Server > " + soFar);
+            }
+
+            writeToFile.close();
+        }
+        catch (Exception e)
+        {
+            System.out.println (e.getMessage());
+        }
+    }
+
     /* Switches Contacts from currently online to offline in their respective ListViews */
     public void refreshList ()
     {
@@ -143,7 +206,17 @@ public class Client implements Runnable
                         }
                         else
                         {
-                            chatLine = new Text(tab.getText() + " > " + array[0] + "\n");
+                            if (array[0].contains("//FRIENDFILE"))
+                            {
+                                String [] prefix = array[0].split(">>:");
+                                String fileName = prefix[1];
+
+                                recvFile(fileName);
+                                chatLine = new Text(tab.getText() + " has sent you a file.\n");
+                            }
+                            else
+                                chatLine = new Text(tab.getText() + " > " + array[0] + "\n");
+
                             isGoodTransmission = true;
                         }
 

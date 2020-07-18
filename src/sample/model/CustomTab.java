@@ -13,11 +13,15 @@ public class CustomTab extends Tab
 {
     public static Client client;
     public static TabPane tabPane;
+    public static int tabCount = 0;
 
     public CustomTab (String title, Node node, TabPane tabPane, Client client)
     {
         super(title, node);
+        tabCount++;
         this.tabPane = tabPane;
         this.client = client;
+
+        this.setOnCloseRequest(event -> tabCount--);
     }
 }
