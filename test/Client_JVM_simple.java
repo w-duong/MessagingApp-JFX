@@ -16,7 +16,7 @@ public class Client_JVM_simple
     private static DataOutputStream goingOut;
     private static DataInputStream comingIn;
 
-    public void sendFile () throws Exception
+    public static void sendFile () throws Exception
     {
         try
         {
@@ -45,9 +45,9 @@ public class Client_JVM_simple
         }
     }
 
-    public void recvFile (String fileName) throws Exception
+    public static void recvFile (String fileName) throws Exception
     {
-        String path = "/Desktop/" + filename;
+        String path = "/Desktop/" + fileName;
 
         try
         {
