@@ -159,7 +159,7 @@ public class Client_JVM_simple
                         else if (messageIn.contains("//FRIENDFILE"))
                         {
                             String [] packet = messageIn.split("@");
-                            String [] prefix = packet[0].split(">>:")
+                            String [] prefix = packet[0].split(">>:");
                             String fileName = prefix[1];
 
                             recvFile(fileName);
