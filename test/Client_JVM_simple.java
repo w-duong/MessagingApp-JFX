@@ -28,7 +28,7 @@ public class Client_JVM_simple
             int remaining = 0; 
             int soFar = 0;
 
-            while ((remaining = bfstream.read(sendBuffer, 0, sendBuffer.length)) != -1)
+            while ((remaining = bfstream.read(sendBuffer, 0, sendBuffer.length)) > 0)
             {
                 goingOut.write(sendBuffer, 0, remaining);
                 soFar += remaining;
