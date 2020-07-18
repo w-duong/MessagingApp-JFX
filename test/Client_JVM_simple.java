@@ -28,7 +28,10 @@ public class Client_JVM_simple
             int remaining = 0; 
             int soFar = 0;
 
-            while ((remaining = bfstream.read(sendBuffer, 0, sendBuffer.length)) != -1)
+            long sizeOfFile = outboundFile.length();
+            goingOut.writeLong(sizeOfFile);
+
+            while ((remaining = bfstream.read(sendBuffer, 0, sendBuffer.length)) > 0)
             {
                 goingOut.write(sendBuffer, 0, remaining);
                 soFar += remaining;
@@ -58,7 +61,9 @@ public class Client_JVM_simple
             int readEachTime = 0;
             int soFar = 0;
 
-            while ((readEachTime = comingIn.read(readBuffer, 0, readBuffer.length)) != -1)
+            long sizeOfFile = comingIn.readLong();
+
+            while ((sizeOfFile > soFar) && ((readEachTime = comingIn.read(readBuffer, 0, readBuffer.length)) > 0))
             {
                 writeToFile.write(readBuffer, 0, readEachTime);
                 soFar += readEachTime;
