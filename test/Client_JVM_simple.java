@@ -25,19 +25,22 @@ public class Client_JVM_simple
             BufferedInputStream bfstream = new BufferedInputStream (fstream);
 
             byte [] sendBuffer = new byte [4096];
-            int remaining = 0; 
+            int remaining = null; 
             int soFar = 0;
 
-            while ((remaining = bfstream.read(sendBuffer, 0, sendBuffer.length)) > 0)
+            while ((remaining = bfstream.read(sendBuffer, 0, sendBuffer.length)) != -1)
             {
                 goingOut.write(sendBuffer, 0, remaining);
                 soFar += remaining;
                 System.out.println ("Amount of data sent > " + soFar);
+                if(remaining == 0)
+                {
+                    goingOut.flush();
+                    bfstream.close();
+                    fstream.close();
+                    return;
+                }
             }
-
-            goingOut.flush();
-            bfstream.close();
-            fstream.close();
         }
         catch (Exception e)
         {
@@ -55,7 +58,7 @@ public class Client_JVM_simple
             OutputStream writeToFile = new FileOutputStream (incomingFile);
 
             byte [] readBuffer = new byte [1024];
-            int readEachTime = 0;
+            int readEachTime = null;
             int soFar = 0;
 
             while ((readEachTime = comingIn.read(readBuffer, 0, readBuffer.length)) != -1)
@@ -64,9 +67,12 @@ public class Client_JVM_simple
                 soFar += readEachTime;
 
                 System.out.println ("Read from Server > " + soFar);
+                if(readEachTime == 0)
+                {
+                    writeToFile.close();
+                    return;
+                }
             }
-
-            writeToFile.close();
         }
         catch (Exception e)
         {
