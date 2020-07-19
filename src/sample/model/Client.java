@@ -18,7 +18,8 @@ import java.util.*;
 public class Client implements Runnable
 {
     // MISC:
-    TabPane tabPane;
+    private String filePathToSend;
+    private TabPane tabPane;
     private ObservableList<Contact> contacts = FXCollections.observableArrayList();
     private ObservableList<Contact> onlineNow = FXCollections.observableArrayList();
 
@@ -63,6 +64,7 @@ public class Client implements Runnable
     public void setContacts (ObservableList<Contact> contacts) { this.contacts = contacts; }
     public void setOnlineNow(ObservableList<Contact> onlineNow){ this.onlineNow= onlineNow;}
     public void setTabPane (TabPane tabPane) { this.tabPane = tabPane; }
+    public void setFilePathToSend (String filePathToSend) { this.filePathToSend = filePathToSend; }
 
     public String getSelfIdentifier () {return this.selfIdentifier; }
     public String getServerName () { return this.serverName; }
@@ -87,17 +89,21 @@ public class Client implements Runnable
     {
         try
         {
+            /* Prepare File object and associated Stream to read to buffer */
             File outboundFile = new File (absolutePath);
             FileInputStream fstream = new FileInputStream(outboundFile);
             BufferedInputStream bfstream = new BufferedInputStream (fstream);
 
+            /* Internal buffering prior to sending data to wire */
             byte [] sendBuffer = new byte [4096];
-            int remaining = 0;
-            int soFar = 0;
+            int remaining = 0; // number of bytes read from File to internal buffer
+            long soFar = 0;     // counter to keep track of elapsed size (OPTIONAL)
 
+            /* Send size of File out to Server FIRST */
             long sizeOfFile = outboundFile.length();
             goingOut.writeLong(sizeOfFile);
 
+            /* Continue to read bytes from File until '0' bytes remaining */
             while ((remaining = bfstream.read(sendBuffer, 0, sendBuffer.length)) > 0)
             {
                 goingOut.write(sendBuffer, 0, remaining);
@@ -105,7 +111,8 @@ public class Client implements Runnable
                 System.out.println ("Amount of data sent > " + soFar);
             }
 
-            goingOut.flush();
+            /* Clean up open Streams */
+            goingOut.flush(); // (OPTIONAL???)
             bfstream.close();
             fstream.close();
         }
@@ -117,19 +124,24 @@ public class Client implements Runnable
 
     public void recvFile (String fileName) throws Exception
     {
+        /* DEFAULT location for receiving file is user's Desktop */
         String path = "/Desktop/" + fileName;
 
         try
         {
+            /* Prepare File object and Stream for writing out data */
             File incomingFile = new File (System.getProperty("user.home"), path);
             OutputStream writeToFile = new FileOutputStream (incomingFile);
 
+            /* Internal buffering prior to writing to File stream */
             byte [] readBuffer = new byte [1024];
             int readEachTime = 0;
-            int soFar = 0;
+            long soFar = 0;          // bytes received for current File thus far
 
+            /* Receive size of File PRIOR to receiving actual data */
             long sizeOfFile = comingIn.readLong();
 
+            /* Continue receiving data until 'sizeOfFile' reached */
             while ((sizeOfFile > soFar) && ((readEachTime = comingIn.read(readBuffer, 0, readBuffer.length)) > 0))
             {
                 writeToFile.write(readBuffer, 0, readEachTime);
@@ -138,6 +150,7 @@ public class Client implements Runnable
                 System.out.println ("Read from Server > " + soFar);
             }
 
+            /* Close open Streams */
             writeToFile.close();
         }
         catch (Exception e)
@@ -164,6 +177,7 @@ public class Client implements Runnable
         {
             try
             {
+                /* Check for Server specific messages first. */
 //                String messageIn = comingIn.readLine();
                 String messageIn = comingIn.readUTF();
                 if (messageIn.equals("LOGOUT"))
@@ -175,21 +189,21 @@ public class Client implements Runnable
                     exit = true;
                     break;
                 }
+                else if (messageIn.contains("ACKNSEND")) // if recipient for File transfer request found, initiate transfer
+                    sendFile(filePathToSend);
 
                 /* parse message for body-recipient-sender */
                 String [] array = messageIn.split("@");
-
-                for (String packets : array)
-                    System.out.println (packets);
 
                 /* sort through Tab group within TabPane and identify correct sender */
                 for (Tab tab : tabPane.getTabs())
                     if (tab.getId().equals(array[2]))
                     {
+                        /* Prepare Text element to add to TextFlow node */
                         Text chatLine = null;
                         boolean isGoodTransmission = false;
 
-                        /* If message is a Server level command... */
+                        /* If message is a Server level notification... */
                         if (array[0].equals("//FRIENDOUT") || array[0].equals("//FRIENDOFF"))
                         {
                             if (array[1].equals("ALL"))
@@ -206,7 +220,7 @@ public class Client implements Runnable
                         }
                         else
                         {
-                            if (array[0].contains("//FRIENDFILE"))
+                            if (array[0].contains("//FRIENDFILE")) // this client was found to be receptive of a File transfer
                             {
                                 String [] prefix = array[0].split(">>:");
                                 String fileName = prefix[1];

@@ -57,6 +57,7 @@ public class messageMainController implements Initializable
 
     public void menuSendFile (ActionEvent event) throws Exception
     {
+        /* File transfer is specific for the currently selected Tab within the TabPane */
         if (CustomTab.tabCount == 0)
         {
             Alert popup = new Alert (Alert.AlertType.ERROR, "No Contact Tabs Available");
@@ -68,7 +69,7 @@ public class messageMainController implements Initializable
         FileChooser fileChooser = new FileChooser();
         File selectedFile = fileChooser.showOpenDialog(null);
 
-        if (selectedFile != null)
+        if (selectedFile != null) // if user cancels out of File selection dialog
         {
             String fileName = selectedFile.getName();
             String filePath = selectedFile.getAbsolutePath();
@@ -77,7 +78,7 @@ public class messageMainController implements Initializable
             String sender = CustomTab.client.getSelfIdentifier();
 
             CustomTab.client.sendMessage (String.format ("//FRIENDFILE>>:%s@%s@%s", fileName, recipient, sender) );
-            CustomTab.client.sendFile(filePath);
+            CustomTab.client.setFilePathToSend(filePath);
         }
     }
 
